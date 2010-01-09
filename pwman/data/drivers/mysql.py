@@ -81,40 +81,10 @@ class MySQLDatabase(Database):
         self._cur.close()
         self._con.close()
 
-    def listtags(self, all=False):
-        sql = ''
+    def listtags(self):
+        sql = "SELECT DATA FROM %sTAGS ORDER BY DATA ASC" % (self._prefix)
         params = []
         i = 0
-        if len(self._filtertags) == 0 or all:
-            sql = "SELECT DATA FROM %sTAGS ORDER BY DATA ASC" % (self._prefix)
-        else:
-            sql = ("SELECT %sTAGS.DATA FROM %sLOOKUP"
-                   +" INNER JOIN %sTAGS ON %sLOOKUP.TAG = %sTAGS.ID"
-                   +" WHERE NODE IN (") % (self._prefix, self._prefix, self._prefix,
-                                           self._prefix, self._prefix)
-            first = True
-
-            i += 1
-
-            for t in self._filtertags:
-                if not first:
-                    sql += " INTERSECT "
-                else:
-                    first = False
-                
-                sql += ("SELECT NODE FROM %sLOOKUP LEFT JOIN %sTAGS ON TAG = %sTAGS.ID "
-                        + " WHERE %sTAGS.DATA = %%s") % (self._prefix, self._prefix,
-                                                             self._prefix, self._prefix)
-                params.append(cPickle.dumps(t))
-            sql += ") EXCEPT SELECT DATA FROM %sTAGS WHERE " %(self._prefix)
-            first = True
-            for t in self._filtertags:
-                if not first:
-                    sql += " OR "
-                else:
-                    first = False
-                sql += "%sTAGS.DATA = %%s" % (self._prefix)
-                params.append(cPickle.dumps(t))
         try:
             cursor = self._get_cur()
             cursor.execute(sql, params)

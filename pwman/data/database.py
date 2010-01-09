@@ -48,7 +48,7 @@ class Database:
         newkey = enc.changepassword()
         return self.savekey(newkey)
     
-    def listtags(self, all=False):
+    def listtags(self):
         pass
 
     def currenttags(self):

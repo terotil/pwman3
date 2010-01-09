@@ -51,34 +51,9 @@ class SQLiteDatabase(Database):
         self._cur.close()
         self._con.close()
 
-    def listtags(self, all=False):
-        sql = ''
+    def listtags(self):
+        sql = "SELECT DATA FROM TAGS ORDER BY DATA ASC"
         params = []
-        if len(self._filtertags) == 0 or all:
-            sql = "SELECT DATA FROM TAGS ORDER BY DATA ASC"
-        else:
-            sql = ("SELECT TAGS.DATA FROM LOOKUP"
-                   +" INNER JOIN TAGS ON LOOKUP.TAG = TAGS.ID"
-                   +" WHERE NODE IN (")
-            first = True
-            for t in self._filtertags:
-                if not first:
-                    sql += " INTERSECT "
-                else:
-                    first = False
-                    
-                sql += ("SELECT NODE FROM LOOKUP OUTER JOIN TAGS ON TAG = TAGS.ID "
-                        + " WHERE TAGS.DATA = ?")
-                params.append(cPickle.dumps(t))
-            sql += ") EXCEPT SELECT DATA FROM TAGS WHERE "
-            first = True
-            for t in self._filtertags:
-                if not first:
-                    sql += " OR "
-                else:
-                    first = False
-                sql += "TAGS.DATA = ?"
-                params.append(cPickle.dumps(t))
         try:
             self._cur.execute(sql, params)
 
@@ -164,7 +139,7 @@ class SQLiteDatabase(Database):
                     sql += " INTERSECT "
                 else:
                     first = False
-                sql += ("SELECT NODE FROM LOOKUP OUTER JOIN TAGS ON TAG = TAGS.ID"
+                sql += ("SELECT NODE FROM LOOKUP JOIN TAGS ON TAG = TAGS.ID"
                         + " WHERE TAGS.DATA = ? ")
 
                 params.append(cPickle.dumps(t))

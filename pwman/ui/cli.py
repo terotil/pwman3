@@ -140,7 +140,7 @@ class PwmanCli(cmd.Cmd):
                 defaultstr += "%s " % (t.get_name())
 
         strings = []
-        tags = self._db.listtags(True)
+        tags = self._db.listtags()
         for t in tags:
             strings.append(t.get_name())
 
@@ -175,31 +175,6 @@ class PwmanCli(cmd.Cmd):
         for t in node.get_tags():
             print "%s " % t.get_name(),
         print
-
-    def do_tags(self, arg):
-        tags = self._db.listtags()
-        if len(tags) > 0:
-            tags[0].get_name() # hack to get password request before output
-        print "Tags: ",
-        if len(tags) == 0:
-            print "None",
-        for t in tags:
-            print "%s " % (t.get_name()),
-        print
-
-    def complete_filter(self, text, line, begidx, endidx):
-        strings = []
-        enc = CryptoEngine.get()
-        if not enc.alive():
-            return strings
-        
-        tags = self._db.listtags()
-        for t in tags:
-            name = t.get_name()
-            if name.startswith(text):
-                strings.append(t.get_name())
-        return strings
-
 
     def do_filter(self, args):
         tagstrings = args.split()
